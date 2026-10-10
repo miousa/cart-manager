@@ -6,3 +6,4 @@ venv/
 .env
 .ideas/
 .vscode/
+data/carts.json
