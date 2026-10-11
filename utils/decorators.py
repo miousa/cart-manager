@@ -37,7 +37,7 @@ def validate_item(func: Callable):
             if not item_name.strip():
                 print("Имя не может быть пустым")
                 return
-            result = self.func(item_name, price)
+            result = func(self, item_name, price)
             return result
         else:
             print("Цена товара не может быть 0 или отрицательной")
@@ -51,16 +51,14 @@ def retry(max_attempts: int, delay: float):
         @wraps(func)
         def inner(*args, **kwargs):
             for attempt in range(1, max_attempts + 1):
-                sleep(delay)
                 try:
                     result = func(*args, **kwargs)
-                    return
+                    return result
                 except Exception as e:
-                    print(f"Попытка {attempt}/{max_attempts}")
-                    if max_attempts == 0:
-                        print(f"{e}")
-
-            return result
+                    print(f"Попытка {attempt}/{max_attempts} упала: {e}")
+                    if attempt == max_attempts:
+                        raise
+                    sleep(delay)
 
         return inner
 
