@@ -1,5 +1,8 @@
+from typing import TYPE_CHECKING
 from storage import save_data
-from models import CartManager
+
+if TYPE_CHECKING:
+    from models import CartManager
 
 
 def numeric_check(prompt: str) -> int:

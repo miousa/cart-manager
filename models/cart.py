@@ -1,3 +1,6 @@
+from utils import log_calls
+
+
 class Cart:
     def __init__(self, owner: str, name: str):
         self.owner = owner
@@ -6,9 +9,11 @@ class Cart:
 
     """Дейтсвия с корзиной: удаление/добавление/печать предметов - их стоимости"""
 
+    @log_calls
     def add_item(self, item_name: str, price: int) -> None:  # Добавление предметов
         self.items.append({"name": item_name, "price": price})
 
+    @log_calls
     def delete_item(self, item_name: str) -> bool:  # Удаление предметов
         for i, item in enumerate(self.items):
             if item["name"] == item_name:

@@ -1,10 +1,4 @@
-from utils import (
-    print_cart_menu,
-    print_menu,
-    numeric_check,
-    stats_cart,
-    save,
-)
+from utils import print_cart_menu, print_menu, numeric_check, stats_cart, save
 from models import Cart, CartManager
 from storage import load_data
 
