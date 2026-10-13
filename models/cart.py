@@ -61,7 +61,7 @@ class Cart:
 
     @classmethod
     def from_dict(cls, data: dict) -> "Cart":
-        """Метод применимый для класса. Собирает данные словаря обратно в обьект"""
+        """Метод применимый для класса. Собирает данные json словаря обратно в обьект"""
         cart = cls(data["owner"], data["name"])
         cart.items = data["items"]
         return cart
