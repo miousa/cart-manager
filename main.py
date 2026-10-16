@@ -1,4 +1,12 @@
-from utils import print_cart_menu, print_menu, numeric_check, stats_cart, save
+from utils import (
+    print_cart_menu,
+    print_menu,
+    numeric_check,
+    stats_cart,
+    save,
+    Timer,
+    autosave,
+)
 from models import Cart, CartManager
 from storage import load_data
 
@@ -15,7 +23,6 @@ def cart_menu(cart: Cart, manager: CartManager) -> None:
             item = input("Введите имя товара (для добавления): ").strip()
             price = numeric_check("Введите его цену: ")
             cart.add_item(item, price)
-            print(f"Товар {item} добавлен.")
             save(manager)
 
         elif choice == 2:
@@ -35,7 +42,8 @@ def cart_menu(cart: Cart, manager: CartManager) -> None:
 
 
 def manager_menu() -> None:
-    manager = CartManager.from_dict(load_data())
+    with Timer():
+        manager = CartManager.from_dict(load_data())
 
     while True:
         print_menu()
@@ -45,24 +53,32 @@ def manager_menu() -> None:
             break
 
         elif choice == 1:
-            owner = input("Имя владельца: ").strip()
-            if manager.add_owner(owner):
-                print(f"Владелец {owner} был создан!\n")
-                save(manager)
+            with autosave(manager):
+                owner = input("Имя владельца: ").strip()
+                if owner.replace(" ", ""):
+                    if manager.add_owner(owner):
+                        print(f"Владелец {owner} был создан!\n")
+                        continue
 
-            else:
-                print("Такой владелец уже есть")
-                print("Возвращаюсь в меню...\n")
-                continue
+                    else:
+                        print("Такой владелец уже есть")
+                        print("Возвращаюсь в меню...\n")
+                        continue
+                else:
+                    print("Имя владельца не может быть пустым")
 
         elif choice == 2:
             owner = input("Имя владельца: ").strip()
             name_cart = input("Имя корзины (если нету создадится новая): ").strip()
-            if manager.create_cart(owner, name_cart):
+            result = manager.create_cart(owner, name_cart)
+            if result:
                 print(f"Корзина '{name_cart}' для владельца '{owner}' была создана!\n")
                 save(manager)
-            else:
-                print(f"Корзина '{name_cart}' для владельца '{owner}' уже имеется\n")
+            elif result == False:
+                print(
+                    f"Корзина '{name_cart}' для владельца '{owner}' уже существует!\n"
+                )
+                save(manager)
 
         elif choice == 3:
             if not manager.show_all():

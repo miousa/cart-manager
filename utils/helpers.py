@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from storage import save_data
+from .decorators import time_counter
 
 if TYPE_CHECKING:
     from models import CartManager
@@ -32,6 +33,7 @@ carts = {
 """
 
 
+@time_counter
 def stats_cart(carts: dict) -> dict:
     total_carts = 0
     total_products = 0
