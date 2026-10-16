@@ -69,9 +69,8 @@ class Cart:
 
     def to_dict(self) -> dict:
         """Возвращает данные обьекта превращая их в словарь (Конвертер обьекта в словарь)"""
-        data = {"owner": self.owner, "name": self.name}
+        data = {"owner": self.owner, "name": self.name, "items": []}
         for item in self.items:
-            data.setdefault("items", [])
             data["items"].append(item.to_dict())
 
         return data
@@ -80,5 +79,5 @@ class Cart:
     def from_dict(cls, data: dict) -> "Cart":
         """Метод применимый для класса. Собирает данные json словаря обратно в обьект"""
         cart = cls(data["owner"], data["name"])
-        cart.items = data["items"]
+        cart.items = [Item.from_dict(item) for item in data["items"]]
         return cart
