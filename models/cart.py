@@ -1,4 +1,5 @@
 from utils import log_calls, validate_item
+from .item import Item
 
 
 class Cart:
@@ -13,13 +14,13 @@ class Cart:
     @log_calls
     def add_item(self, item_name: str, price: int) -> None:
         """Добавляет товар в корзину (Имя - цена)"""
-        self.items.append({"name": item_name, "price": price})
+        self.items.append(Item(item_name, price))
 
     @log_calls
     def delete_item(self, item_name: str) -> bool:
         """Удаляет товар из корзины"""
         for i, item in enumerate(self.items):
-            if item["name"] == item_name:
+            if item.name == item_name:
                 del self.items[i]
                 return True
         return False
@@ -31,14 +32,25 @@ class Cart:
         else:
             print("\nСодержимое:\n")
             for i, item in enumerate(self.items, start=1):
-                print(f"{i}. {item['name']} - {item['price']}")
+                print(f"{i}. {item.name} - {item.price}")
         return True
+
+    """Магические методы"""
+
+    def __len__(self):
+        return len(self.items)
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __contains__(self, item_name):
+        return any(i.name == item_name for i in self.items)
 
     """Статистика корзины: средняя стоимость предмета/количество предмотов/общая стоимость"""
 
     def get_total(self) -> int:
         """Возвращает общую стоимость всех товаров в корзине"""
-        return sum(item["price"] for item in self.items)
+        return sum(item.price for item in self.items)
 
     def get_average(self) -> float:
         """Считает и возвращает среднюю стоимость товара"""
@@ -57,7 +69,12 @@ class Cart:
 
     def to_dict(self) -> dict:
         """Возвращает данные обьекта превращая их в словарь (Конвертер обьекта в словарь)"""
-        return {"owner": self.owner, "name": self.name, "items": self.items}
+        data = {"owner": self.owner, "name": self.name}
+        for item in self.items:
+            data.setdefault("items", [])
+            data["items"].append(item.to_dict())
+
+        return data
 
     @classmethod
     def from_dict(cls, data: dict) -> "Cart":
