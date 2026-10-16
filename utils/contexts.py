@@ -6,6 +6,7 @@ from .helpers import save
 class Timer:
     def __enter__(self):
         self.start = perf_counter()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end = perf_counter()
@@ -18,9 +19,6 @@ def autosave(manager):
     try:
         print("[LOG] Начинаем работу")
         yield manager
-    except:
-        raise
     finally:
-        if manager:
-            save(manager)
-            print("[LOG] Файл сохранен")
+        save(manager)
+        print("[LOG] Файл сохранен")
