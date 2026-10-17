@@ -7,7 +7,7 @@ from utils import (
     Timer,
     autosave,
 )
-from models import Cart, CartManager
+from models import Cart, CartManager, ItemError
 from storage import load_data
 
 
@@ -22,8 +22,17 @@ def cart_menu(cart: Cart, manager: CartManager) -> None:
         elif choice == 1:
             item = input("Введите имя товара (для добавления): ").strip()
             price = numeric_check("Введите его цену: ")
-            cart.add_item(item, price)
-            save(manager)
+            flag = False
+
+            try:
+                cart.add_item(item, price)
+                save(manager)
+                flag = True
+            except ItemError as e:
+                print(f"\nОшибка добавления: {e}")
+
+            if flag:
+                print(f"\nТовар {item} был успешно добавлен!")
 
         elif choice == 2:
             item = input("Введите имя товара (для удаления): ").strip()
@@ -54,7 +63,7 @@ def manager_menu() -> None:
 
         elif choice == 1:
             with autosave(manager):
-                owner = input("Имя владельца: ").strip()
+                owner = input("\nИмя владельца: ").strip()
                 if owner.replace(" ", ""):
                     if manager.add_owner(owner):
                         print(f"Владелец {owner} был создан!\n")
@@ -68,33 +77,35 @@ def manager_menu() -> None:
                     print("Имя владельца не может быть пустым")
 
         elif choice == 2:
-            owner = input("Имя владельца: ").strip()
-            name_cart = input("Имя корзины (если нету создадится новая): ").strip()
-            result = manager.create_cart(owner, name_cart)
-            if result:
-                print(f"Корзина '{name_cart}' для владельца '{owner}' была создана!\n")
-                save(manager)
-            elif result == False:
-                print(
-                    f"Корзина '{name_cart}' для владельца '{owner}' уже существует!\n"
-                )
-                save(manager)
+            with autosave(manager):
+                owner = input("\nИмя владельца: ").strip()
+                name_cart = input("Имя корзины: ").strip()
+                flag = manager.create_cart(owner, name_cart)
+                if flag:
+                    print(
+                        f"Корзина '{name_cart}' для владельца '{owner}' была создана!\n"
+                    )
+                    save(manager)
+                elif flag == False:
+                    print(
+                        f"Корзина '{name_cart}' для владельца '{owner}' уже существует!\n"
+                    )
 
         elif choice == 3:
-            if not manager.show_all():
-                print("Нет корзин для удаления")
-                continue
-            owner = input("\nИмя владельца: ").strip()
-            name_cart = input("Имя корзины (для удаления): ").strip()
+            with autosave(manager):
+                if not manager.show_all():
+                    print("Нет корзин для удаления")
+                    continue
+                owner = input("\nИмя владельца: ").strip()
+                name_cart = input("Имя корзины (для удаления): ").strip()
 
-            if manager.delete_cart(owner, name_cart):
-                print(f"Корзина {name_cart} была удалена!\n")
-                save(manager)
+                if manager.delete_cart(owner, name_cart):
+                    print(f"Корзина {name_cart} была удалена!\n")
 
         elif choice == 4:
             manager.show_all()
-            owner = input("Имя владельца: ").strip()
-            name_cart = input("Имя корзины (для входа): ").strip()
+            owner = input("\nИмя владельца: ").strip()
+            name_cart = input("Имя корзины: ").strip()
 
             cart = manager.work_owner(owner, name_cart)
 
@@ -107,8 +118,8 @@ def manager_menu() -> None:
             manager.show_all()
 
         elif choice == 6:
-            print("\nСтатистика:")
             owners = stats_cart(manager.carts)
+            print("\nСтатистика:")
             for name_stat, value in owners.items():
                 print(f"{name_stat} - {value}")
 
