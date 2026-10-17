@@ -1,4 +1,4 @@
-from utils import log_calls, validate_item
+from utils import log_calls
 from .item import Item
 
 
@@ -10,7 +10,6 @@ class Cart:
 
     """Дейтсвия с корзиной: удаление/добавление/печать предметов - их стоимости"""
 
-    @validate_item
     @log_calls
     def add_item(self, item_name: str, price: int) -> None:
         """Добавляет товар в корзину (Имя - цена)"""
@@ -32,7 +31,7 @@ class Cart:
         else:
             print("\nСодержимое:\n")
             for i, item in enumerate(self.items, start=1):
-                print(f"{i}. {item.name} - {item.price}")
+                print(f"{i}. {item.name} - {item._price}")
         return True
 
     """Магические методы"""
@@ -48,22 +47,17 @@ class Cart:
 
     """Статистика корзины: средняя стоимость предмета/количество предмотов/общая стоимость"""
 
-    def get_total(self) -> int:
+    @property
+    def total(self) -> int:
         """Возвращает общую стоимость всех товаров в корзине"""
-        return sum(item.price for item in self.items)
+        return sum(item._price for item in self.items)
 
-    def get_average(self) -> float:
+    @property
+    def average(self) -> float:
         """Считает и возвращает среднюю стоимость товара"""
         if not self.items:
             return 0.0
-        return self.get_total() / len(self.items)
-
-    def count_items(self) -> int:
-        """Возвращает количество предметов в корзине"""
-        if not self.items:
-            return 0
-        else:
-            return len(self.items)
+        return self.total / len(self.items)
 
     """Методы для преобразования из обьекта класса в словарь, а из словаря обратно в обьекты класса, с полным сохранением и без потери результата, нужны для работы с функциям для сохранение в *.json"""
 
