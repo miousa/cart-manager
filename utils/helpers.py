@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 from storage import save_data
-from .decorators import time_counter
+from .decorators import log_calls
 
 if TYPE_CHECKING:
     from models import CartManager
@@ -22,18 +22,18 @@ def save(manager: CartManager) -> None:
 """
 carts = {
     'owner1': {
-        'cart1': __object__.Cart(class) -> [{item: price}, {item: price}, ...],
-        'cart2': __object__.Cart(class) -> [{item: price}, {item: price}, ...]
+        'cart1': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...],
+        'cart2': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...]
     },
     'owner2': {
-        'cart1': __object__.Cart(class) -> [{item: price}, {item: price}, ...],
-       'cart2': __object__.Cart(class) -> [{item: price}, {item: price}, ...]
+        'cart1': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...],
+       'cart2': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...]
     }
 }
 """
 
 
-@time_counter
+@log_calls
 def stats_cart(carts: dict) -> dict:
     total_carts = 0
     total_products = 0
@@ -46,10 +46,10 @@ def stats_cart(carts: dict) -> dict:
 
         # Проходимся по списку обьектов классa Cart
         for cart in owner_carts.values():  # cart это экземпляр класса Cart
-            # Далее считаем общее количество продуктов с помощью метода count_items() у класса Cart
-            total_products += cart.count_items()
-            # Таким же образом считаем общую стоимость всех предметов
-            total_price += cart.get_total()
+            # Далее считаем общее количество продуктов с помощью __len__ у класса Cart
+            total_products += len(cart)
+            # Cчитаем общую стоимость всех предметов
+            total_price += cart.total
 
     # Считаем среднюю стоимость одного предмета и проверяем, чтобы был хотябы 1 предмет
     average = (
@@ -69,13 +69,12 @@ def stats_cart(carts: dict) -> dict:
 # Печать 1-го меню
 def print_cart_menu(name: str) -> None:
     menu_text = (
-        f"{'-' * 40}\n"
-        f"{' ' * 12} {name.upper()}\n"
-        f"{' ' * 4}1. Добавить товар в корзину\n"
+        f"\n{'-' * 30 + name.upper() + '-' * 30}\n"
+        f"\n{' ' * 4}1. Добавить товар в корзину\n"
         f"{' ' * 4}2. Удалить товар с корзины\n"
         f"{' ' * 4}3. Показать все товары\n"
         f"{' ' * 4}0. Выход в главное меню\n"
-        f"{'-' * 40}\n"
+        f"\n{'-' * (60 + len(name))}\n"
     )
     print(menu_text)
 
@@ -83,15 +82,14 @@ def print_cart_menu(name: str) -> None:
 # Печать 2-ого меню
 def print_menu() -> None:
     menu_text = (
-        f"{'-' * 40}\n"
-        f"{'-' * 17} MENU {'-' * 17}\n"
-        f"{' ' * 4}1. Создать владельца\n"
+        f"\n{'-' * 30 + 'MENU' + '-' * 30}\n"
+        f"\n{' ' * 4}1. Создать владельца\n"
         f"{' ' * 4}2. Создать корзину\n"
         f"{' ' * 4}3. Удалить корзину\n"
         f"{' ' * 4}4. Войти в корзину\n"
         f"{' ' * 4}5. Показать всех владельцев\n"
         f"{' ' * 4}6. Статистика\n"
         f"{' ' * 4}0. Выход\n"
-        f"\n{'-' * 40}\n"
+        f"\n{'-' * 64}\n"
     )
     print(menu_text)

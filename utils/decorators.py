@@ -2,15 +2,20 @@ from typing import Callable
 from functools import wraps
 from time import perf_counter, sleep
 
+design = "-" * 30 + "[LOG]" + "-" * 31
+last = "-" * 66
+
 
 # 1
 def log_calls(func: Callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        print(f"[LOG] Вызов {func.__name__} c arg={args} kwargs={kwargs}")
-        print(f"[LOG] Обьяснение функции: {func.__doc__}")
+        print(
+            f"\n{design}\nВызов функции - {func.__name__} c arg={args} kwargs={kwargs}"
+        )
+        print(f"Обьяснение функции: {func.__doc__}")
         result = func(*args, **kwargs)
-        print(f"[LOG] {func.__name__} вернул {result}")
+        print(f"{func.__name__} вернул {result}\n{last}")
         return result
 
     return wrapper
@@ -34,13 +39,15 @@ def validate_item(func: Callable):
     @wraps(func)
     def wrapper(self, item_name, price):
         if price > 0:
-            if not item_name.strip():
+            if not item_name.replace(" ", ""):
                 print("Имя не может быть пустым")
                 return
             result = func(self, item_name, price)
+            print(f"Товар {item_name} добавлен.")
             return result
         else:
             print("Цена товара не может быть 0 или отрицательной")
+            return
 
     return wrapper
 
