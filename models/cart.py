@@ -50,7 +50,7 @@ class Cart:
     @property
     def total(self) -> int:
         """Возвращает общую стоимость всех товаров в корзине"""
-        return sum(item._price for item in self.items)
+        return sum(item.price for item in self.items)
 
     @property
     def average(self) -> float:
