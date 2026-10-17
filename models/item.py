@@ -1,7 +1,22 @@
+from .exceptions import EmptyNameError, InvalidPriceError
+
+
 class Item:
     def __init__(self, name: str, price: int):
+        if not name.replace(" ", ""):
+            raise EmptyNameError("Имя товара не может быть пустым")
         self.name = name
         self.price = price
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value):
+        if value <= 0:
+            raise InvalidPriceError(f"Цена должна быть > 0, получено: {value}")
+        self._price = value
 
     def __repr__(self):
         return f"Item({self.name!r}, {self.price!r})"
@@ -19,7 +34,7 @@ class Item:
 
     def to_dict(self) -> dict:
         """Возвращает данные обьекта превращая их в словарь (Конвертер обьекта в словарь)"""
-        return {"name": self.name, "price": self.price}
+        return {"name": self.name, "price": self._price}
 
     @classmethod
     def from_dict(cls, data: dict) -> "Item":
