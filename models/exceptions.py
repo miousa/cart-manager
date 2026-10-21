@@ -1,7 +1,10 @@
-class ItemError(Exception): ...
+class ItemError(Exception):
+    pass
 
 
-class InvalidPriceError(ItemError): ...
+class InvalidPriceError(ItemError):
+    pass
 
 
-class EmptyNameError(ItemError): ...
+class EmptyNameError(ItemError):
+    pass

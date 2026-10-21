@@ -1,58 +1,37 @@
-from utils import (
-    print_cart_menu,
-    print_menu,
-    numeric_check,
-    stats_cart,
-    save,
+from app_utils import (
+    DATA_FILE,
     Timer,
-    autosave,
+    numeric_check,
+    print_menu,
 )
-from models import Cart, CartManager, ItemError
-from storage import load_data
 
+from menu import (
+    handle_add_owner,
+    handle_create_cart,
+    handle_delete_cart,
+    handle_open_cart,
+    handle_show_all,
+    handle_show_stats,
+)
 
-def cart_menu(cart: Cart, manager: CartManager) -> None:
-    while True:
-        print_cart_menu(cart.name)
-        choice = numeric_check("Выбери действие: ")
+from models import CartManager
 
-        if choice == 0:
-            break
-
-        elif choice == 1:
-            item = input("Введите имя товара (для добавления): ").strip()
-            price = numeric_check("Введите его цену: ")
-            flag = False
-
-            try:
-                cart.add_item(item, price)
-                save(manager)
-                flag = True
-            except ItemError as e:
-                print(f"\nОшибка добавления: {e}")
-
-            if flag:
-                print(f"\nТовар {item} был успешно добавлен!")
-
-        elif choice == 2:
-            item = input("Введите имя товара (для удаления): ").strip()
-            if cart.delete_item(item):
-                print(f"\nПредмет {item} был удален!")
-                save(manager)
-            else:
-                print(f"Товар {item} не найден.")
-
-        elif choice == 3:
-            if not cart.show_items():
-                print("Корзина пуста.")
-
-        else:
-            print("Такого пункта нет, попробуй ещё раз.")
+from storage import JsonStorage
 
 
 def manager_menu() -> None:
     with Timer():
-        manager = CartManager.from_dict(load_data())
+        storage = JsonStorage(DATA_FILE)
+        manager = CartManager.from_dict(storage.load())
+
+    actions = {
+        1: handle_add_owner,
+        2: handle_create_cart,
+        3: handle_delete_cart,
+        4: handle_open_cart,
+        5: handle_show_all,
+        6: handle_show_stats,
+    }
 
     while True:
         print_menu()
@@ -61,70 +40,12 @@ def manager_menu() -> None:
         if choice == 0:
             break
 
-        elif choice == 1:
-            with autosave(manager):
-                owner = input("\nИмя владельца: ").strip()
-                if owner.replace(" ", ""):
-                    if manager.add_owner(owner):
-                        print(f"Владелец {owner} был создан!\n")
-                        continue
-
-                    else:
-                        print("Такой владелец уже есть")
-                        print("Возвращаюсь в меню...\n")
-                        continue
-                else:
-                    print("Имя владельца не может быть пустым")
-
-        elif choice == 2:
-            with autosave(manager):
-                owner = input("\nИмя владельца: ").strip()
-                name_cart = input("Имя корзины: ").strip()
-                flag = manager.create_cart(owner, name_cart)
-                if flag:
-                    print(
-                        f"Корзина '{name_cart}' для владельца '{owner}' была создана!\n"
-                    )
-                    save(manager)
-                elif flag == False:
-                    print(
-                        f"Корзина '{name_cart}' для владельца '{owner}' уже существует!\n"
-                    )
-
-        elif choice == 3:
-            with autosave(manager):
-                if not manager.show_all():
-                    print("Нет корзин для удаления")
-                    continue
-                owner = input("\nИмя владельца: ").strip()
-                name_cart = input("Имя корзины (для удаления): ").strip()
-
-                if manager.delete_cart(owner, name_cart):
-                    print(f"Корзина {name_cart} была удалена!\n")
-
-        elif choice == 4:
-            manager.show_all()
-            owner = input("\nИмя владельца: ").strip()
-            name_cart = input("Имя корзины: ").strip()
-
-            cart = manager.work_owner(owner, name_cart)
-
-            if cart is None:
-                print("Попробуйте еще раз!")
-                continue
-            cart_menu(cart, manager)
-
-        elif choice == 5:
-            manager.show_all()
-
-        elif choice == 6:
-            owners = stats_cart(manager.carts)
-            print("\nСтатистика:")
-            for name_stat, value in owners.items():
-                print(f"{name_stat} - {value}")
-
-        else:
+        action = actions.get(choice)
+        if action is None:
             print("Такого пункта нет, попробуй ещё раз.")
+            continue
+
+        action(manager)
 
 
 def main():

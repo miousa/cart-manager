@@ -1,5 +1,6 @@
-from time import perf_counter
 from contextlib import contextmanager
+from time import perf_counter
+
 from .helpers import save
 
 design_time = "-" * 30 + "[TIME]" + "-" * 30

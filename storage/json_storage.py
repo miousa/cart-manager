@@ -1,21 +1,23 @@
-import json
+from json import JSONDecodeError, dump, load
 from pathlib import Path
 
-
-DATA_FILE = Path(__file__).parent.parent / "data" / "carts.json"
-
-
-def save_data(data: dict) -> None:
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+from .base import Storage
 
 
-def load_data() -> dict:
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
-    except json.JSONDecodeError:
-        print("Файл поврежден и будет перезаписан.")
-        return {}
+class JsonStorage(Storage):
+    def __init__(self, path: str | Path):
+        self.path = path
+
+    def save(self, data: dict) -> None:
+        with open(self.path, "w", encoding="utf-8") as f:
+            dump(data, f, ensure_ascii=False, indent=2)
+
+    def load(self) -> dict:
+        try:
+            with open(self.path, "r", encoding="utf-8") as f:
+                return load(f)
+        except FileNotFoundError:
+            return {}
+        except JSONDecodeError:
+            print("Файл поврежден и будет перезаписан.")
+            return {}

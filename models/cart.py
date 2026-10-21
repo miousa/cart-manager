@@ -1,4 +1,5 @@
-from utils import log_calls
+from app_utils import log_calls
+
 from .item import Item
 
 
@@ -8,7 +9,7 @@ class Cart:
         self.name = name
         self.items = []
 
-    """Дейтсвия с корзиной: удаление/добавление/печать предметов - их стоимости"""
+    """Дейтсвия с корзиной: удаление/добавление/печать"""
 
     @log_calls
     def add_item(self, item_name: str, price: int) -> None:

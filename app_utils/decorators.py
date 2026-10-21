@@ -1,32 +1,33 @@
-from typing import Callable
 from functools import wraps
 from time import perf_counter, sleep
+from typing import Callable
 
-design = "-" * 30 + "[LOG]" + "-" * 31
+design = "-" * 30 + "[LOG]" + "-" * 31 + '\n'
 last = "-" * 66
 
 
-# 1
 def log_calls(func: Callable):
     @wraps(func)
-    def wrapper(*args, **kwargs):
-        print(
-            f"\n{design}\nВызов функции - {func.__name__} c arg={args} kwargs={kwargs}"
-        )
+    def wrapper(*args, **kwargs):        
+        print(f"{design}\nВызов функции: {func.__name__}c arg={args} kw={kwargs}")
+
         print(f"Обьяснение функции: {func.__doc__}")
+
         result = func(*args, **kwargs)
+
         print(f"{func.__name__} вернул {result}\n{last}")
         return result
 
     return wrapper
 
 
-# 2
 def time_counter(func: Callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = perf_counter()
+
         result = func(*args, **kwargs)
+
         end = perf_counter()
         print(f"[TIME] {func.__name__} выполнилась за {end - start:.4f} сек.")
         return result
@@ -34,15 +35,16 @@ def time_counter(func: Callable):
     return wrapper
 
 
-# 3
 def validate_item(func: Callable):
     @wraps(func)
     def wrapper(self, item_name, price):
         if price > 0:
+
             if not item_name.replace(" ", ""):
                 print("Имя не может быть пустым")
                 return
             result = func(self, item_name, price)
+
             print(f"Товар {item_name} добавлен.")
             return result
         else:
@@ -52,7 +54,6 @@ def validate_item(func: Callable):
     return wrapper
 
 
-# 4
 def retry(max_attempts: int, delay: float):
     def wrapper(func: Callable):
         @wraps(func)

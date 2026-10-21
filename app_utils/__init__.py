@@ -1,6 +1,6 @@
-# utils/__init__.py
+# app_utils/__init__.py
+from .paths import DATA_FILE
 from .helpers import (
-    DATA_FILE,
     numeric_check,
     print_cart_menu,
     print_menu,
@@ -9,4 +9,3 @@ from .helpers import (
 )
 from .decorators import log_calls, retry, time_counter
 from .contexts import Timer, autosave
-

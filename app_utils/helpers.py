@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING
-from storage import save_data
+
+from storage import JsonStorage
+
 from .decorators import log_calls
+from .paths import DATA_FILE
 
 if TYPE_CHECKING:
     from models import CartManager
@@ -15,22 +18,8 @@ def numeric_check(prompt: str) -> int:
 
 
 def save(manager: CartManager) -> None:
-    save_data(manager.to_dict())
-
-
-# Визуализация наполнения массива carts
-"""
-carts = {
-    'owner1': {
-        'cart1': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...],
-        'cart2': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...]
-    },
-    'owner2': {
-        'cart1': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...],
-       'cart2': __object__.Cart(class) -> [__obj__.Item(class), __obj__.Item(class), ...]
-    }
-}
-"""
+    storage = JsonStorage(DATA_FILE)
+    storage.save(manager.to_dict())
 
 
 @log_calls
